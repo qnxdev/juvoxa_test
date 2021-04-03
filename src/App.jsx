@@ -8,35 +8,46 @@ function App() {
   const [data2, setData2] = useState([]);
   const [error, setError] = useState("");
 
-  const columns1 = useMemo(
-    () => [
-      { Header: "Name of the holding", accessor: "name" },
-      { Header: "Ticker", accessor: "ticker" },
-      { Header: "Asset Class", accessor: "asset_class" },
-      { Header: "Average price", accessor: "avg_price" },
-      { Header: "Market Price", accessor: "market_price" },
-      { Header: "Latest change percentage", accessor: "latest_chg_pct" },
-      { Header: "Market Value in Base CCY", accessor: "market_value_ccy" },
-    ],
-    []
-  );
-  const columns2 = useMemo(
-    () => [
-      { Header: "Name", accessor: "name" },
-      { Header: "Ticket Ref", accessor: "ticketref" },
-      { Header: "Trade Date", accessor: "traded_on" },
-      { Header: "QTY", accessor: "quantity" },
-      { Header: "CCY", accessor: "currency" },
-      { Header: "Settlement Amount", accessor: "settlement_amount" },
-    ],
-    []
-  );
-
+  const formatAmount = ({ value }) => {
+    if (value == null) {
+      return "";
+    } else {
+      const svalue = JSON.stringify(value) || "";
+      return (
+        svalue.split(".")[0].replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") +
+        (svalue.split(".")[1]
+          ? "." +
+            svalue.split(".")[1].slice(0, 2 || svalue.split(".")[1].length)
+          : "")
+      );
+    }
+  };
+  const formatFloat = ({ value }) => {
+    if (value == null) {
+      return "";
+    } else {
+      const svalue = JSON.stringify(value) || "";
+      return (
+        svalue.split(".")[0] +
+        (svalue.split(".")[1]
+          ? "." +
+            svalue.split(".")[1].slice(0, 2 || svalue.split(".")[1].length)
+          : "")
+      );
+    }
+  };
+  const formatDate = ({ value }) => {
+    if (value == null) {
+      return "";
+    } else {
+      return value.replaceAll("-", "/");
+    }
+  };
   const getData = async (url, setData) => {
     await fetch(url)
       .then(async (res) => {
         await res.json().then((r) => {
-          if(r.payload || r.transactions){
+          if (r.payload || r.transactions) {
             setData(tableType === "holdings" ? r.payload : r.transactions);
           }
         });
@@ -46,6 +57,46 @@ function App() {
         setError("Failed to get contents. ");
       });
   };
+
+  const columns1 = useMemo(
+    () => [
+      { Header: "Name of the holding", accessor: "name" },
+      { Header: "Ticker", accessor: "ticker" },
+      { Header: "Asset Class", accessor: "asset_class" },
+      {
+        Header: "Average price",
+        accessor: "avg_price",
+        Cell: formatAmount,
+      },
+      { Header: "Market Price", accessor: "market_price", Cell: formatAmount },
+      {
+        Header: "Latest change percentage",
+        accessor: "latest_chg_pct",
+        Cell: formatFloat,
+      },
+      {
+        Header: "Market Value in Base CCY",
+        accessor: "market_value_ccy",
+        Cell: formatFloat,
+      },
+    ],
+    []
+  );
+  const columns2 = useMemo(
+    () => [
+      { Header: "Name", accessor: "name" },
+      { Header: "Ticket Ref", accessor: "ticketref" },
+      { Header: "Trade Date", accessor: "traded_on", Cell: formatDate },
+      { Header: "QTY", accessor: "quantity", Cell: formatAmount },
+      { Header: "CCY", accessor: "currency" },
+      {
+        Header: "Settlement Amount",
+        accessor: "settlement_amount",
+        Cell: formatAmount,
+      },
+    ],
+    []
+  );
 
   useEffect(() => {
     if (tableType === "holdings" && data1 && data1.length === 0) {
@@ -59,20 +110,33 @@ function App() {
   return (
     <div className="App">
       <div className="tableContainer">
-        <button
-          onClick={() =>
-            setType(tableType === "holdings" ? "transactions" : "holdings")
-          }
-        >
-          {error !== ""
-            ? error + "Click to retry"
-            : tableType === "holdings"
-            ? "View Transactions"
-            : "View Holdings"}
-        </button>
+        <h4>
+          Change View:{" "}
+          <button
+            onClick={() =>
+              setType(tableType === "holdings" ? "transactions" : "holdings")
+            }
+          >
+            {error !== ""
+              ? error + "Click to retry"
+              : tableType === "holdings"
+              ? "View Transactions"
+              : "View Holdings"}
+          </button>
+        </h4>
         {(data1 && data1.length > 0) || (data2 && data2.length > 0) ? (
           <Table
-            data={tableType === "holdings" ? data1 : data2}
+            data={
+              tableType === "holdings"
+                ? {
+                    columns: [...columns1.map((item) => item.accessor)],
+                    payload: data1,
+                  }
+                : {
+                    columns: [...columns2.map((item) => item.accessor)],
+                    payload: data2,
+                  }
+            }
             columns={tableType === "holdings" ? columns1 : columns2}
           />
         ) : (
