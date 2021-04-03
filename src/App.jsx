@@ -43,6 +43,15 @@ function App() {
       return value.replaceAll("-", "/");
     }
   };
+  const sortAmount = (row1, row2, accessor, desc) => {
+    if (!row1.values[accessor] || !row2.values[accessor]) {
+      return !row1.values[accessor] ? -1 : 1;
+    } else {
+      return row1.values[accessor] > row2.values[accessor] ? 1 : -1;
+    }
+  };
+  const sortDate = (row1, row2, accessor, desc) =>
+    row1.values[accessor] > row2.values[accessor] ? 1 : -1;
   const getData = async (url, setData) => {
     await fetch(url)
       .then(async (res) => {
@@ -67,17 +76,25 @@ function App() {
         Header: "Average price",
         accessor: "avg_price",
         Cell: formatAmount,
+        sortType: sortAmount,
       },
-      { Header: "Market Price", accessor: "market_price", Cell: formatAmount },
+      {
+        Header: "Market Price",
+        accessor: "market_price",
+        Cell: formatAmount,
+        sortType: sortAmount,
+      },
       {
         Header: "Latest change percentage",
         accessor: "latest_chg_pct",
         Cell: formatFloat,
+        sortType: sortAmount,
       },
       {
         Header: "Market Value in Base CCY",
         accessor: "market_value_ccy",
         Cell: formatFloat,
+        sortType: sortAmount,
       },
     ],
     []
@@ -87,12 +104,18 @@ function App() {
       { Header: "Name", accessor: "name" },
       { Header: "Ticket Ref", accessor: "ticketref" },
       { Header: "Trade Date", accessor: "traded_on", Cell: formatDate },
-      { Header: "QTY", accessor: "quantity", Cell: formatAmount },
+      {
+        Header: "QTY",
+        accessor: "quantity",
+        Cell: formatAmount,
+        sortType: sortAmount,
+      },
       { Header: "CCY", accessor: "currency" },
       {
         Header: "Settlement Amount",
         accessor: "settlement_amount",
         Cell: formatAmount,
+        sortType: sortAmount,
       },
     ],
     []
