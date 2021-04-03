@@ -1,4 +1,6 @@
-# Juvoxa
+# Juvoxa Custom Table Component
+
+Reusable table component using React library.
 
 ## Available Scripts
 
