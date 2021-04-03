@@ -81,7 +81,9 @@ export const Table = ({ data, columns }) => {
 
   return (
     <>
-      <button onClick={resetResizing}>Reset Column Size</button>
+      <button id="resetColumn" onClick={resetResizing}>
+        Reset Column Size
+      </button>
       <table {...getTableProps()}>
         <thead>
           {headerGroups.map((headerGroup) => (
@@ -96,9 +98,9 @@ export const Table = ({ data, columns }) => {
                       )
                     }
                   >
-                    {"<"}
+                    {"◄"}
                   </button>
-                  {column.render("Header")}
+                  <h4>{column.render("Header")}</h4>
                   <button
                     title="Move this column right"
                     onClick={() =>
@@ -107,14 +109,10 @@ export const Table = ({ data, columns }) => {
                       )
                     }
                   >
-                    {">"}
+                    {"►"}
                   </button>
                   <span>
-                    {column.isSorted
-                      ? column.isSortedDesc
-                        ? '^'
-                        : 'v'
-                      : ''}
+                    {column.isSorted ? (column.isSortedDesc ? "▲" : "▼") : ""}
                   </span>
                   <span
                     title="Resize column"
@@ -181,6 +179,7 @@ export const Table = ({ data, columns }) => {
         <span>
           | Go to page:{" "}
           <input
+            placeholder={pageIndex + 1}
             title="Type in page number"
             min={1}
             max={pageOptions.length}
@@ -210,33 +209,118 @@ export const Table = ({ data, columns }) => {
         </select>
       </div>
       <style jsx="true">{`
-        .table {
-          background-image: linear-gradient(45deg, red 45%, blue 55%);
-          background-origin: border-box;
-          border-spacing: 5px; 
+        button#resetColumn,
+        .pagination button,
+        .pagination select {
+          background: #0070f3;
+          cursor: pointer;
+          border: none;
+          outline: none;
+          border-radius: 7px;
+          padding: 10px;
+          margin: 10px;
+          color: #fff;
+          font-weight: bold;
+          font-size: 0.9rem;
+        }
+        table {
+          box-shadow: 1px 1px 20px 0px rgb(33 58 183 / 10%);
+          overflow-x: auto;
+          overflow-y: hidden;
+          background: #e6e8f4;
+          border-spacing: 5px;
           border: 5px solid transparent;
+          display: block;
+          margin: 50px auto;
+          margin-top: 0px;
+          padding: 10px;
+          width: min-content;
+          border-radius: 12px;
+        }
+        thead button {
+          background: #d6d7e2;
+          cursor: pointer;
+          border: none;
+          outline: none;
+          border-radius: 7px;
+          padding: 5px;
+          margin: 5px;
+          font-weight: bold;
+        }
+        th {
+          display: flex !important;
+          flex-direction: row;
+          justify-content: space-between;
+        }
+        th h4 {
+          margin: 5px;
+          width: max-content;
+        }
+        tbody {
+          background:#d6d7e2;
+          border-radius: 12px;
+          display: block;
+        }
+        tbody tr {
+          padding: 10px;
+          margin: 0 15px;
+          border-bottom: 1px solid #e6e8f4;
         }
         td {
-          background: #fff;
           overflow-wrap: break-word;
           word-wrap: break-word;
-          border: 1px solid #222;
         }
         .resizer {
           display: inline-block;
-          background: blue;
-          width: 10px;
+          background: #d6d7e2;
+          width: 5px;
           height: 100%;
           position: absolute;
           right: 0;
           top: 0;
           transform: translateX(50%);
           z-index: 1;
-          touch-action:none;
-  
+          touch-action: none;
+
           &.isResizing {
             background: red;
           }
+        }
+        .pagination {
+          box-shadow: 1px 1px 20px 0px rgb(33 58 183 / 10%);
+          background: #e6e8f4;
+          padding: 10px;
+          border-radius: 12px;
+          width: 80vw;
+          margin: 0 auto 50px auto;
+          font-size: 1.1rem;
+          text-align: center;
+        }
+        .pagination input {
+          border: none;
+          outline: none;
+          border-radius: 7px;
+          padding: 10px;
+          margin: 10px;
+          margin-left: 0;
+          font-weight: bold;
+          font-size: 0.9rem;
+        }
+        .pagination select option {
+          background: #fff;
+          color: #000;
+        }
+        @media (max-width: 728px) {
+          table {
+            width: 100vw !important;
+          }
+          tbody {
+            display: table-row-group;
+          }
+          .resizer{
+            width: 10px;
+          }
+        }
       `}</style>
     </>
   );

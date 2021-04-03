@@ -50,8 +50,23 @@ function App() {
       return row1.values[accessor] > row2.values[accessor] ? 1 : -1;
     }
   };
-  const sortDate = (row1, row2, accessor, desc) =>
-    row1.values[accessor] > row2.values[accessor] ? 1 : -1;
+  const sortDate = (row1, row2, accessor, desc) => {
+    const a = row1.values[accessor].split("-").map((i) => parseInt(i));
+    const b = row2.values[accessor].split("-").map((i) => parseInt(i));
+    return a[2] > b[2]
+      ? 1
+      : a[2] < b[2]
+      ? -1
+      : a[1] > b[1]
+      ? 1
+      : a[1] < b[1]
+      ? -1
+      : a[0] > b[0]
+      ? 1
+      : a[0] < b[0]
+      ? -1
+      : -1;
+  };
   const getData = async (url, setData) => {
     await fetch(url)
       .then(async (res) => {
@@ -103,7 +118,12 @@ function App() {
     () => [
       { Header: "Name", accessor: "name" },
       { Header: "Ticket Ref", accessor: "ticketref" },
-      { Header: "Trade Date", accessor: "traded_on", Cell: formatDate },
+      {
+        Header: "Trade Date",
+        accessor: "traded_on",
+        Cell: formatDate,
+        sortType: sortDate,
+      },
       {
         Header: "QTY",
         accessor: "quantity",
@@ -133,7 +153,8 @@ function App() {
   return (
     <div className="App">
       <div className="tableContainer">
-        <h4>
+        <h2>{tableType === "holdings" ?  "Holdings":"Transactions"}</h2>
+        <h3>
           Change View:{" "}
           <button
             onClick={() =>
@@ -146,7 +167,7 @@ function App() {
               ? "View Transactions"
               : "View Holdings"}
           </button>
-        </h4>
+        </h3>
         {(data1 && data1.length > 0) || (data2 && data2.length > 0) ? (
           <Table
             data={
@@ -166,6 +187,21 @@ function App() {
           "Loading Table"
         )}
       </div>
+      <style jsx>{`
+        .tableContainer h3 button {
+          background: #0070f3;
+          cursor: pointer;
+          border: none;
+          outline: none;
+          border-radius: 7px;
+          padding: 10px;
+          margin: 10px;
+          color: #fff;
+          font-weight: bold;
+          font-size: 0.9rem;
+          min-width: 200px;
+        }
+      `}</style>
     </div>
   );
 }
