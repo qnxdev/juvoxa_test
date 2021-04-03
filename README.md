@@ -21,6 +21,4 @@ Edit and Reuse Components using Storybook.
 
 ## Usage of Table component
 
-`<Table \
-    data={Object<columns: Array<List of accessors> , payload: Array<List of Data objects>} \
-    columns={Object<Header: Column-Header, accessor: ColumnAccessor>} />`
+`<Table data={Object<columns: Array<List of accessors> , payload: Array<List of Data objects>} columns={Object<Header: Column-Header, accessor: ColumnAccessor>} >`
